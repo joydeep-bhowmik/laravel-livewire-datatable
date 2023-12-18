@@ -52,7 +52,7 @@
                 @endif
             </div>
             {{-- seachbox and filters and columns --}}
-            <div class="flex items-center gap-2 rounded-md border-2 px-2 text-gray-300 shadow-sm focus-within:border-black focus-within:text-black"
+            <div class="flex items-center gap-2 rounded-md border px-2 text-gray-300 shadow-sm focus-within:text-black focus-within:ring-2 focus-within:ring-black"
                 tabindex="-1">
                 <svg class="h-6 w-6 animate-spin fill-black text-gray-200 dark:text-gray-600" aria-hidden="true"
                     wire:loading viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -68,8 +68,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                 </svg>
-                <input class="peer border-none px-0 outline-none" type="text" wire:model.live.debounce.500ms="search"
-                    placeholder="Search">
+                <input class="peer !border-none px-0 !outline-none !ring-0" type="text"
+                    wire:model.live.debounce.500ms="search" placeholder="Search">
             </div>
             @if (count($this->filters()))
                 @php
