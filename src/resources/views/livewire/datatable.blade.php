@@ -2,7 +2,6 @@
     columns: false,
     filters: false,
     bulkActions: false,
-
     selectAll(state) {
         $el.querySelectorAll('table input[type=checkbox]').forEach((el) => {
             if (state) {
