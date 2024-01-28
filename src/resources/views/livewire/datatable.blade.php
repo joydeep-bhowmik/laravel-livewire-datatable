@@ -81,7 +81,7 @@
                     }
                 @endphp
                 <button class="relative" type="button" x-on:click="filters=!filters">
-                    <div class="absolute -right-2 top-0 z-[1] h-fit rounded-lg border bg-gray-50 px-[2px] text-xs">
+                    <div class="absolute -left-2 top-0 z-[1] h-fit rounded-lg border bg-gray-50 px-[2px] text-xs">
                         {{ $filtercount }}
                     </div>
                     <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -90,7 +90,7 @@
                             d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
                     </svg>
                 </button>
-                <div class="absolute right-2 top-full flex w-full max-w-[250px] flex-col gap-4 rounded-md border bg-white p-5 shadow-md"
+                <div class="absolute left-2 top-full flex w-full max-w-[250px] flex-col gap-4 rounded-md border bg-white p-5 shadow-md"
                     style="display: none" x-show="filters" x-transition @click.outside="filters=false">
                     <div class="flex">
                         <h2 class="text-base font-bold">Filters</h2>
@@ -162,7 +162,7 @@
                             d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z" />
                     </svg>
                 </button>
-                <div class="absolute right-2 top-full flex w-full max-w-[250px] flex-col gap-4 rounded-md border bg-white p-5 shadow-md"
+                <div class="absolute left-2 top-full flex w-full max-w-[250px] flex-col gap-4 rounded-md border bg-white p-5 shadow-md"
                     style="display: none" x-show="columns" x-transition @click.outside="columns=false">
                     <h2 class="font-bold">Columns</h2>
                     @foreach ($this->table() as $field)
