@@ -18,7 +18,7 @@
     }
 }">
     @if ($headers)
-        <div class="header relative flex gap-3 p-3">
+        <div class="header relative flex flex-wrap gap-3 p-3">
             {{-- bluckactions --}}
             <div class="mr-auto w-full">
                 @if (count($this->bulkActions()))
