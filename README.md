@@ -13,14 +13,10 @@ To get started with Laravel Livewire Datatable, follow these steps:
 composer require joydeep-bhowmik/livewire-datatable
 ```
 
-2. Add this service providers in your /config/app.php
+2. Add this service providers in your /bootstrap/providers.php (Laravel 11 +)
 ```PHP
-'providers' => [
-    // ...
-
  // datatable service provider
-        JoydeepBhowmik\LivewireDatatable\Providers\DataTableServiceProvider::class,
-],
+JoydeepBhowmik\LivewireDatatable\Providers\DataTableServiceProvider::class,
 ```
 
 3. Publish the stylesheet :
