@@ -1,4 +1,5 @@
 <?php
+
 namespace JoydeepBhowmik\LivewireDatatable\utils;
 
 class Button
@@ -8,6 +9,7 @@ class Button
     public $action;
     public $confirm;
     public $_button_id;
+    public $color;
     public function __construct($name)
     {
         $this->name = $name;
@@ -25,6 +27,11 @@ class Button
     public function confirm(string $text)
     {
         $this->confirm = $text;
+        return $this->generateButtonId();
+    }
+    public function color(string $hex)
+    {
+        $this->color = $hex;
         return $this->generateButtonId();
     }
     protected function generateButtonId()
