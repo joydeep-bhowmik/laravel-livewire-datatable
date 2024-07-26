@@ -19,9 +19,39 @@
 }">
     @if ($headers)
         <div class="header relative flex flex-wrap gap-3 p-3">
+            {{-- bluckactions --}}
+            <div class="mr-auto w-full">
+                @if (count($this->bulkActions()))
 
+                    <button class= "flex rounded-md border p-2 shadow-sm" type="button"
+                        x-on:click="bulkActions=!bulkActions" x-show="$wire.ids.length">
+                        &#10247 <span class="hidden md:block">Bulk actions</span>
+                    </button>
+                    <div class="absolute left-0 right-0 top-full flex w-full gap-4 border bg-white shadow-md"
+                        style="display: none" x-show="bulkActions" @click.outside="bulkActions=false" x-transition>
+                        <div class="flex gap-4 overflow-x-auto p-3">
+                            @foreach ($this->bulkActions() as $button)
+                                <button
+                                    class="{{ $button->name == 'delete' ? 'bg-red-500 text-white' : 'bg-gray-50' }} max-w-fit rounded-md border px-3 py-2"
+                                    type="button" onclick="{!! $button->confirm
+                                        ? 'return confirm(' . '\'' . $button->confirm . '\'' . ') || event . stopImmediatePropagation()'
+                                        : '' !!}" wire:click="{{ $button->action }}">
+                                    {{ $button->text ? $button->text : $button->name }}
+                                </button>
+                            @endforeach
+                        </div>
+                        <button class="ml-auto px-3" type="button" x-on:click="bulkActions=!bulkActions">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                @endif
+            </div>
             {{-- seachbox and filters and columns --}}
-            <div class="flex w-full items-center gap-2 rounded-md border px-2 text-gray-300 shadow-sm focus-within:text-black focus-within:ring-2 focus-within:ring-black md:max-w-xs"
+            <div class="flex items-center gap-2 rounded-md border px-2 text-gray-300 shadow-sm focus-within:text-black focus-within:ring-2 focus-within:ring-black"
                 tabindex="-1">
                 <svg class="h-6 w-6 animate-spin fill-black text-gray-200 dark:text-gray-600" aria-hidden="true"
                     wire:loading viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -40,149 +70,113 @@
                 <input class="peer !border-0 !border-none px-0 !outline-none !ring-0" type="text"
                     wire:model.live.debounce.500ms="search" placeholder="Search">
             </div>
-            <div class="flex items-center gap-3">
-                @if (count($this->filters()))
-                    @php
-                        $filtercount = 0;
+            @if (count($this->filters()))
+                @php
+                    $filtercount = 0;
 
-                        foreach ($filters as $filter) {
-                            if (isset($filter) && !empty($filter)) {
-                                $filtercount++;
-                            }
+                    foreach ($filters as $filter) {
+                        if (isset($filter) && !empty($filter)) {
+                            $filtercount++;
                         }
-                    @endphp
-                    <button class="relative" type="button" x-on:click="filters=!filters">
-                        <div class="absolute -left-2 top-0 z-[1] h-fit rounded-lg border bg-gray-50 px-[2px] text-xs">
-                            {{ $filtercount }}
-                        </div>
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
-                        </svg>
-                    </button>
-                    <div class="absolute left-2 top-full flex w-full max-w-[250px] flex-col gap-4 rounded-md border bg-white p-5 shadow-md"
-                        style="display: none" x-show="filters" x-transition @click.outside="filters=false">
-                        <div class="flex">
-                            <h2 class="text-base font-bold">Filters</h2>
-                            <button class="ml-auto text-sm font-bold text-blue-400"
-                                wire:click="resetFilters">Reset</button>
-                        </div>
-                        @foreach ($this->filters() as $filter)
-                            @php
-                                $filter->name = $filter->label ? $filter->label : $filter->name;
-                            @endphp
-                            <label class="text-sm" for="{{ $filter->_filter_id }}" wire:key="{{ $filter->_filter_id }}">
-                                @if ($filter->type == 'select')
-                                    <div class="relative flex w-full flex-col gap-2">
-                                        <div class="font-semibold">
-                                            {{ $filter->name }}
-                                        </div>
-                                        <select
-                                            class="focus:shadow-outline block w-full appearance-none rounded border border-gray-300 bg-white py-2 pl-2 pr-8 leading-tight focus:outline-none"
-                                            id="" name=""
-                                            wire:model.live.debounce.500ms="filters.{{ $filter->_filter_id }}"
-                                            wire:loading.attr="disabled">
-                                            @foreach ($filter->options as $key => $value)
-                                                <option class="mr-5" value="{{ $key }}">{{ $value }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-
-                                    </div>
-                                @elseif(in_array($filter->type, ['checkbox', 'radio']))
-                                    <div class="flex gap-3">
-                                        <input class="rounded-md" id="{{ $filter->_filter_id }}"
-                                            type="{{ $filter->type }}" value="{{ $filter->_filter_id }}"
-                                            wire:model.live.debounce.500ms="filters.{{ $filter->_filter_id }}"
-                                            wire:loading.attr="disabled">
-                                        <div class="font-semibold">
-                                            {{ $filter->name }}
-                                        </div>
-                                    </div>
-                                @else
-                                    <div class="flex w-full flex-col gap-2">
-                                        <div class="font-semibold">
-                                            {{ $filter->name }}
-                                        </div>
-                                        <input
-                                            class="focus:shadow-outline block w-full appearance-none rounded border border-gray-300 bg-white py-2 pl-2 pr-8 leading-tight focus:outline-none"
-                                            id="{{ $filter->_filter_id }}" type="{{ $filter->type }}"
-                                            value="{{ $filter->_filter_id }}"
-                                            wire:model.live.debounce.500ms="filters.{{ $filter->_filter_id }}"
-                                            wire:loading.attr="disabled"
-                                            placeholder="{{ $filter->placeholder ? $filter->placeholder : '' }}">
-                                    </div>
-                                @endif
-                            </label>
-                        @endforeach
+                    }
+                @endphp
+                <button class="relative" type="button" x-on:click="filters=!filters">
+                    <div class="absolute -left-2 top-0 z-[1] h-fit rounded-lg border bg-gray-50 px-[2px] text-xs">
+                        {{ $filtercount }}
                     </div>
-                @endif
-
-                @if (count($this->table()))
-                    <button type="button" x-on:click="columns=!columns">
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z" />
-                        </svg>
-                    </button>
-                    <div class="absolute left-2 top-full flex w-full max-w-[250px] flex-col gap-4 rounded-md border bg-white p-5 shadow-md"
-                        style="display: none" x-show="columns" x-transition @click.outside="columns=false">
-                        <h2 class="font-bold">Columns</h2>
-                        @foreach ($this->table() as $field)
-                            <label class="flex gap-3" for="{{ $field->_field_id }}"
-                                wire:key="{{ $field->_field_id }}">
-                                <input id="{{ $field->_field_id }}" type="checkbox" value="{{ $field->_field_id }}"
-                                    wire:model.live="columns" wire:loading.attr="disabled"
-                                    {{ count($columns) < 4 && in_array($field->_field_id, $columns) ? 'disabled' : '' }}>
-                                {{ $field->label ? $field->label : $this->get_field_name($field) }}
-                            </label>
-                        @endforeach
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                    </svg>
+                </button>
+                <div class="absolute left-2 top-full flex w-full max-w-[250px] flex-col gap-4 rounded-md border bg-white p-5 shadow-md"
+                    style="display: none" x-show="filters" x-transition @click.outside="filters=false">
+                    <div class="flex">
+                        <h2 class="text-base font-bold">Filters</h2>
+                        <button class="ml-auto text-sm font-bold text-blue-400" wire:click="resetFilters">Reset</button>
                     </div>
-                @endif
-                @if ($exportable)
-                    <button class="mr-auto" type="button" wire:click="exportCsv">
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path
-                                d="M13.2 12L16 16H13.6L12 13.7143L10.4 16H8L10.8 12L8 8H10.4L12 10.2857L13.6 8H15V4H5V20H19V8H16L13.2 12ZM3 2.9918C3 2.44405 3.44749 2 3.9985 2H16L20.9997 7L21 20.9925C21 21.5489 20.5551 22 20.0066 22H3.9934C3.44476 22 3 21.5447 3 21.0082V2.9918Z">
-                            </path>
-                        </svg>
-                    </button>
-                @endif
-            </div>
+                    @foreach ($this->filters() as $filter)
+                        @php
+                            $filter->name = $filter->label ? $filter->label : $filter->name;
+                        @endphp
+                        <label class="text-sm" for="{{ $filter->_filter_id }}" wire:key="{{ $filter->_filter_id }}">
+                            @if ($filter->type == 'select')
+                                <div class="relative flex w-full flex-col gap-2">
+                                    <div class="font-semibold">
+                                        {{ $filter->name }}
+                                    </div>
+                                    <select
+                                        class="focus:shadow-outline block w-full appearance-none rounded border border-gray-300 bg-white py-2 pl-2 pr-8 leading-tight focus:outline-none"
+                                        id="" name=""
+                                        wire:model.live.debounce.500ms="filters.{{ $filter->_filter_id }}"
+                                        wire:loading.attr="disabled">
+                                        @foreach ($filter->options as $key => $value)
+                                            <option class="mr-5" value="{{ $key }}">{{ $value }}
+                                            </option>
+                                        @endforeach
+                                    </select>
 
-            {{-- bluckactions --}}
-            <div class="relative float-right w-fit">
-                @if (count($this->bulkActions()))
+                                </div>
+                            @elseif(in_array($filter->type, ['checkbox', 'radio']))
+                                <div class="flex gap-3">
+                                    <input class="rounded-md" id="{{ $filter->_filter_id }}"
+                                        type="{{ $filter->type }}" value="{{ $filter->_filter_id }}"
+                                        wire:model.live.debounce.500ms="filters.{{ $filter->_filter_id }}"
+                                        wire:loading.attr="disabled">
+                                    <div class="font-semibold">
+                                        {{ $filter->name }}
+                                    </div>
+                                </div>
+                            @else
+                                <div class="flex w-full flex-col gap-2">
+                                    <div class="font-semibold">
+                                        {{ $filter->name }}
+                                    </div>
+                                    <input
+                                        class="focus:shadow-outline block w-full appearance-none rounded border border-gray-300 bg-white py-2 pl-2 pr-8 leading-tight focus:outline-none"
+                                        id="{{ $filter->_filter_id }}" type="{{ $filter->type }}"
+                                        value="{{ $filter->_filter_id }}"
+                                        wire:model.live.debounce.500ms="filters.{{ $filter->_filter_id }}"
+                                        wire:loading.attr="disabled"
+                                        placeholder="{{ $filter->placeholder ? $filter->placeholder : '' }}">
+                                </div>
+                            @endif
+                        </label>
+                    @endforeach
+                </div>
+            @endif
 
-                    <button class="-ml-2 flex rounded-md p-2" type="button" style="display: none"
-                        x-on:click="bulkActions=!bulkActions" x-show="$wire.ids.length">
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
-                        </svg>
-                    </button>
-
-                    <div class="absolute left-0 right-0 top-full flex w-fit gap-4 rounded-md border bg-white shadow-md"
-                        style="display: none" x-show="bulkActions" @click.outside="bulkActions=false" x-transition>
-                        <div class="flex gap-4 overflow-x-auto px-3">
-                            @foreach ($this->bulkActions() as $button)
-                                <button class="max-w-fit rounded-md px-3 py-2 font-bold" type="button"
-                                    style="color:{{ $button->color }}" onclick="{!! $button->confirm
-                                        ? 'return confirm(' . '\'' . $button->confirm . '\'' . ') || event . stopImmediatePropagation()'
-                                        : '' !!}"
-                                    wire:click="{{ $button->action }}">
-                                    {{ $button->text ? $button->text : $button->name }}
-                                </button>
-                            @endforeach
-                        </div>
-
-                    </div>
-
-                @endif
-            </div>
+            @if (count($this->table()))
+                <button type="button" x-on:click="columns=!columns">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z" />
+                    </svg>
+                </button>
+                <div class="absolute left-2 top-full flex w-full max-w-[250px] flex-col gap-4 rounded-md border bg-white p-5 shadow-md"
+                    style="display: none" x-show="columns" x-transition @click.outside="columns=false">
+                    <h2 class="font-bold">Columns</h2>
+                    @foreach ($this->table() as $field)
+                        <label class="flex gap-3" for="{{ $field->_field_id }}" wire:key="{{ $field->_field_id }}">
+                            <input id="{{ $field->_field_id }}" type="checkbox" value="{{ $field->_field_id }}"
+                                wire:model.live="columns" wire:loading.attr="disabled"
+                                {{ count($columns) < 4 && in_array($field->_field_id, $columns) ? 'disabled' : '' }}>
+                            {{ $field->label ? $field->label : $this->get_field_name($field) }}
+                        </label>
+                    @endforeach
+                </div>
+            @endif
+            @if ($exportable)
+                <button class="mr-auto" type="button" wire:click="exportCsv">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path
+                            d="M13.2 12L16 16H13.6L12 13.7143L10.4 16H8L10.8 12L8 8H10.4L12 10.2857L13.6 8H15V4H5V20H19V8H16L13.2 12ZM3 2.9918C3 2.44405 3.44749 2 3.9985 2H16L20.9997 7L21 20.9925C21 21.5489 20.5551 22 20.0066 22H3.9934C3.44476 22 3 21.5447 3 21.0082V2.9918Z">
+                        </path>
+                    </svg>
+                </button>
+            @endif
         </div>
     @endif
     <div class="overflow-x-auto">
