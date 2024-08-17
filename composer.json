@@ -1,7 +1,7 @@
 {
   "name": "joydeep-bhowmik/livewire-datatable",
   "description": "A laravel livewire datatable package ",
-  "version": "v1.0.3",
+  "version": "v1.0.4",
   "type": "library",
   "keywords": [
     "laravel",
