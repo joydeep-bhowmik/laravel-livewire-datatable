@@ -278,16 +278,16 @@
             @if ($paginator->lastPage() > 1)
                 <div class="hidden p-2 md:block"> Showing Page {{ $paginator->currentPage() }} of
                     {{ $paginator->lastPage() }}</div>
-                <div class="mx-auto flex w-fit items-center justify-center divide-x overflow-hidden rounded-md border">
+                <div class="mx-auto flex w-fit items-center justify-center overflow-hidden rounded-md border">
                     <label class="hidden p-2 sm:block" for="perppage---">Perpage</label>
-                    <select class="block p-2" id="perppage---" name=""
+                    <select class="block !border-0 !outline-none !ring-0" id="perppage---" name=""
                         wire:model.live.debounce.500ms="perpage" wire:loading.attr="disabled">
                         <option value="10">10</option>
                         <option value="25">50</option>
                         <option value="50">50</option>
                         <option value="9999999999">All</option>
                     </select>
-                    <span class="w-[4px]"></span>
+
                 </div>
                 <ul
                     class="ml-auto hidden max-w-fit break-inside-avoid-column items-center divide-x rounded-md border md:flex">
@@ -306,7 +306,7 @@
                         </li>
                     @endif
                     <li>
-                        <input class="w-14 p-2" type="tel" placeholder="Jump"
+                        <input class="w-14 !border-0 p-2 !outline-none !ring-0" type="tel" placeholder="Jump"
                             wire:change="gotoPage( $event.target.value, 'page')" wire:loading.attr="disabled">
                     </li>
                     <!-- Jump to First Page -->
