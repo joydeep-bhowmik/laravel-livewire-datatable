@@ -63,20 +63,6 @@ class Datatable extends Component
         </div>
         HTML;
     }
-    /**
-     * The `mount` function in PHP is used to assign values to object properties and then call the
-     * `setup` method.
-     *
-     * @param properties An array of key-value pairs representing the properties to be set on the
-     * object.
-     */
-    public function mount($properties = [])
-    {
-        foreach ($properties as $key => $value) {
-            $this->{$key} = $value;
-        }
-        $this->setup();
-    }
 
     /**
      * The setup function initializes the columns and filters of a class based on the table and filter
