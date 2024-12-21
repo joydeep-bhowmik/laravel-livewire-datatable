@@ -27,7 +27,7 @@
                         x-on:click="bulkActions=!bulkActions" x-show="$wire.ids.length">
                         &#10247 <span class="hidden md:block">Bulk actions</span>
                     </button>
-                    <div class="absolute left-0 right-0 top-full flex w-full gap-4 border bg-white shadow-md"
+                    <div class="absolute left-0 right-0 top-full flex w-full gap-4 border bg-white  dark:bg-gray-800 shadow-md"
                         style="display: none" x-show="bulkActions" @click.outside="bulkActions=false" x-transition>
                         <div class="flex gap-4 overflow-x-auto p-3">
                             @foreach ($this->bulkActions() as $button)
@@ -67,7 +67,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                 </svg>
-                <input class="peer !border-0 !border-none px-0 !outline-none !ring-0" type="text"
+                <input class="peer p-2 !bg-transparent !border-0 !border-none px-0 !outline-none !ring-0" type="text"
                     wire:model.live.debounce.500ms="search" placeholder="Search">
             </div>
             @if (count($this->filters()))
@@ -81,7 +81,8 @@
                     }
                 @endphp
                 <button class="relative" type="button" x-on:click="filters=!filters">
-                    <div class="absolute -left-2 top-0 z-[1] h-fit rounded-lg border bg-gray-50 px-[2px] text-xs">
+                    <div
+                        class="absolute -left-2 top-0 z-[1] h-fit rounded-lg border bg-gray-50 dark:bg-gray-600 px-[2px] text-xs">
                         {{ $filtercount }}
                     </div>
                     <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -90,7 +91,7 @@
                             d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
                     </svg>
                 </button>
-                <div class="absolute left-2 top-full flex w-full max-w-[250px] flex-col gap-4 rounded-md border bg-white p-5 shadow-md"
+                <div class="absolute left-2 top-full flex w-full max-w-[250px] flex-col gap-4 rounded-md border bg-white dark:bg-gray-800 p-5 shadow-md"
                     style="display: none" x-show="filters" x-transition @click.outside="filters=false">
                     <div class="flex">
                         <h2 class="text-base font-bold">Filters</h2>
@@ -107,7 +108,7 @@
                                         {{ $filter->name }}
                                     </div>
                                     <select
-                                        class="focus:shadow-outline block w-full appearance-none rounded border border-gray-300 bg-white py-2 pl-2 pr-8 leading-tight focus:outline-none"
+                                        class="focus:shadow-outline block w-full appearance-none rounded border border-gray-300 bg-white dark:bg-gray-800 py-2 pl-2 pr-8 leading-tight focus:outline-none"
                                         id="" name=""
                                         wire:model.live.debounce.500ms="filters.{{ $filter->_filter_id }}"
                                         wire:loading.attr="disabled">
@@ -134,7 +135,7 @@
                                         {{ $filter->name }}
                                     </div>
                                     <input
-                                        class="focus:shadow-outline block w-full appearance-none rounded border border-gray-300 bg-white py-2 pl-2 pr-8 leading-tight focus:outline-none"
+                                        class="focus:shadow-outline block w-full appearance-none rounded border border-gray-300 bg-white  dark:bg-gray-800 py-2 pl-2 pr-8 leading-tight focus:outline-none"
                                         id="{{ $filter->_filter_id }}" type="{{ $filter->type }}"
                                         value="{{ $filter->_filter_id }}"
                                         wire:model.live.debounce.500ms="filters.{{ $filter->_filter_id }}"
@@ -155,7 +156,7 @@
                             d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z" />
                     </svg>
                 </button>
-                <div class="absolute left-2 top-full flex w-full max-w-[250px] flex-col gap-4 rounded-md border bg-white p-5 shadow-md"
+                <div class="absolute left-2 top-full flex w-full max-w-[250px] flex-col gap-4 rounded-md border bg-white dark:bg-gray-800 p-5 shadow-md"
                     style="display: none" x-show="columns" x-transition @click.outside="columns=false">
                     <h2 class="font-bold">Columns</h2>
                     @foreach ($this->table() as $field)
@@ -170,7 +171,7 @@
             @endif
             @if ($exportable)
                 <button class="mr-auto" type="button" wire:click="exportCsv">
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="currentColor">
                         <path
                             d="M13.2 12L16 16H13.6L12 13.7143L10.4 16H8L10.8 12L8 8H10.4L12 10.2857L13.6 8H15V4H5V20H19V8H16L13.2 12ZM3 2.9918C3 2.44405 3.44749 2 3.9985 2H16L20.9997 7L21 20.9925C21 21.5489 20.5551 22 20.0066 22H3.9934C3.44476 22 3 21.5447 3 21.0082V2.9918Z">
                         </path>
@@ -180,7 +181,7 @@
         </div>
     @endif
     <div class="overflow-x-auto">
-        <table class="w-full divide-y divide-gray-200 border">
+        <table class="w-full divide-y  border">
             <thead>
                 <tr class="divide-x">
                     @if (count($data))
@@ -227,7 +228,7 @@
                     // dd($_all_ids);
                 @endphp
                 @forelse($data as $row)
-                    <tr class="even:bg-gray-50">
+                    <tr class="even:bg-gray-50 dark:even:bg-gray-800">
                         @if ($checkbox)
                             <td class="w-fit items-center gap-3 whitespace-nowrap p-3 px-5 text-left">
                                 <input type="checkbox" value="{{ $_all_ids[$i] }}" wire:key="{{ $_all_ids[$i] }}"
