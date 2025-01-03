@@ -1,4 +1,5 @@
 <?php
+
 namespace JoydeepBhowmik\LivewireDatatable;
 
 use JoydeepBhowmik\LivewireDatatable\utils\Button;
@@ -47,14 +48,12 @@ class Datatable extends Component
         return [];
     }
     public function builder()
-    {
+    {}
 
-    }
-
-    function placeholder()
+    public function placeholder()
     {
-        return  <<<HTML
-        <div class="flex items-center justify-center p-5"> 
+        return <<<HTML
+        <div class="flex items-center justify-center p-5">
             <svg class="h-6 w-6 animate-spin" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
             <path
                 d="M3.05469 13H5.07065C5.55588 16.3923 8.47329 19 11.9998 19C15.5262 19 18.4436 16.3923 18.9289 13H20.9448C20.4474 17.5 16.6323 21 11.9998 21C7.36721 21 3.55213 17.5 3.05469 13ZM3.05469 11C3.55213 6.50005 7.36721 3 11.9998 3C16.6323 3 20.4474 6.50005 20.9448 11H18.9289C18.4436 7.60771 15.5262 5 11.9998 5C8.47329 5 5.55588 7.60771 5.07065 11H3.05469Z">
@@ -89,7 +88,6 @@ class Datatable extends Component
         return array_filter($fields, function ($field) {
             return in_array($field->_field_id, $this->columns);
         });
-
     }
 
     /**
@@ -111,12 +109,10 @@ class Datatable extends Component
     public function field($str)
     {
         return new Field($str);
-
     }
     public function filter($str)
     {
         return new Filter($str);
-
     }
     public function button($str)
     {
@@ -135,7 +131,6 @@ class Datatable extends Component
         $this->sort = $field;
         $this->sortDirections = [];
         $this->sortDirections[$field] = $direction;
-
     }
     /**
      * The function returns the name of a field, either the "as" value if it exists or the "name" value.
@@ -167,7 +162,6 @@ class Datatable extends Component
             $query = $this->model::query();
         } else {
             $query = $this->builder();
-
         }
 
         foreach ($fields as $field) {
@@ -202,7 +196,7 @@ class Datatable extends Component
             }
         }
         $this->applyFilters($query);
-        $selectable = [...$selectable, ...$this->select];
+        $selectable = [ ...$selectable, ...$this->select];
         $selectable = array_unique($selectable);
         $query->select(...$selectable);
 
@@ -254,7 +248,6 @@ class Datatable extends Component
                 }
                 //if label is present then show label else who field name
                 $body[$field->label ? $field->label : $field->name] = $value;
-
             }
             array_push($table, $body);
             array_push($this->_all_ids, isset($record->{$this->primaryKey}) ? $record->{$this->primaryKey} : null);
@@ -273,19 +266,27 @@ class Datatable extends Component
         $tablebody = $this->tabledata($fields, $this->perpage);
         $data = [];
         $fieldNamesArr = [];
+
+        // Collect field names for the CSV header
         foreach ($fields as $field) {
             array_push($fieldNamesArr, $field->label ? $field->label : $this->get_field_name($field));
         }
 
-        $data = [$fieldNamesArr, ...$tablebody];
-        // dd($data);
+        // Strip tags from each cell in table rows
+        $cleanedTableBody = array_map(function ($row) {
+            return array_map('strip_tags', $row); // Apply strip_tags() to each cell in the row
+        }, $tablebody);
+
+        // Prepare data for the CSV
+        $data = [$fieldNamesArr, ...$cleanedTableBody];
+
         // Define the CSV file name
         $csvFileName = time() . '.csv';
 
         // Open the CSV file for writing
         $file = fopen($csvFileName, 'w');
 
-        // Loop through the array and write each row to the CSV file
+        // Write each row to the CSV file
         foreach ($data as $row) {
             fputcsv($file, $row);
         }
