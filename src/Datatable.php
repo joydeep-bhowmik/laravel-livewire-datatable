@@ -47,8 +47,7 @@ class Datatable extends Component
     {
         return [];
     }
-    public function builder()
-    {}
+    public function builder() {}
 
     public function placeholder()
     {
@@ -171,16 +170,25 @@ class Datatable extends Component
                 array_push($selectable, $field->table . '.' . $field->name . ' as ' . $this->get_field_name($field));
             }
 
-            //searchable
+            // Apply search logic in a closure to avoid conflicting with other where conditions
             if ($this->search) {
-                if (isset($field->searchable) and $field->searchable) {
-                    if (is_callable($field->searchable)) {
-                        call_user_func($field->searchable, $query, $this->search);
-                    } else {
-                        $query->orWhere(($field->table ? $field->table . '.' : '') . $field->name, 'like', '%' . $this->search . '%');
+                $query->where(function ($subQuery) use ($fields) {
+                    foreach ($fields as $field) {
+                        if (isset($field->searchable) && $field->searchable) {
+                            if (is_callable($field->searchable)) {
+                                call_user_func($field->searchable, $subQuery, $this->search);
+                            } else {
+                                $subQuery->orWhere(
+                                    ($field->table ? $field->table . '.' : '') . $field->name,
+                                    'like',
+                                    '%' . $this->search . '%'
+                                );
+                            }
+                        }
                     }
-                }
+                });
             }
+
             // sortable
             if ($this->sort == $this->get_field_name($field)) {
 
@@ -196,7 +204,7 @@ class Datatable extends Component
             }
         }
         $this->applyFilters($query);
-        $selectable = [ ...$selectable, ...$this->select];
+        $selectable = [...$selectable, ...$this->select];
         $selectable = array_unique($selectable);
         $query->select(...$selectable);
 
